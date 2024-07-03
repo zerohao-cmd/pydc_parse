@@ -61,8 +61,8 @@ class ModelMetaclass(ABCMeta):
     def __new__(
         mcs,
         cls_name: str,
-        bases: tuple[type[Any], ...],
-        namespace: dict[str, Any],
+        bases: tuple[type[Any], ...], # 继承的基类
+        namespace: dict[str, Any], # 继承BaseModel的类的namespace,__dict___
         __pydantic_generic_metadata__: PydanticGenericMetadata | None = None,
         __pydantic_reset_parent_namespace__: bool = True,
         _create_model_module: str | None = None,
@@ -89,7 +89,7 @@ class ModelMetaclass(ABCMeta):
         if bases:
             base_field_names, class_vars, base_private_attributes = mcs._collect_bases_data(bases)
 
-            config_wrapper = ConfigWrapper.for_model(bases, namespace, kwargs)
+            config_wrapper = ConfigWrapper.for_model(bases, namespace, kwargs) # 生成wrapper
             namespace['model_config'] = config_wrapper.config_dict
             private_attributes = inspect_namespace(
                 namespace, config_wrapper.ignored_types, class_vars, base_field_names
@@ -261,10 +261,11 @@ class ModelMetaclass(ABCMeta):
         class_vars: set[str] = set()
         private_attributes: dict[str, ModelPrivateAttr] = {}
         for base in bases:
-            if issubclass(base, BaseModel) and base is not BaseModel:
-
+            # 如果类的基类中有BaseModel的子类,  
+            if issubclass(base, BaseModel) and base is not BaseModel: 
                 # model_fields might not be defined yet in the case of generics, so we use getattr here:
-                field_names.update(getattr(base, 'model_fields', {}).keys()) # 
+                # 返回基类中的 属性名 , 类变量 , 私有属性
+                field_names.update(getattr(base, 'model_fields', {}).keys()) 
                 class_vars.update(base.__class_vars__)
                 private_attributes.update(base.__private_attributes__)
         return field_names, class_vars, private_attributes

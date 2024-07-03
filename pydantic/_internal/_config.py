@@ -101,18 +101,26 @@ class ConfigWrapper:
         - options from the base classes (`bases`)
 
         Args:
-            bases: A tuple of base classes.
-            namespace: The namespace of the class being created.
-            kwargs: The kwargs passed to the class being created.
+            bases: A tuple of base classes. 新类的基类
+            namespace: The namespace of the class being created. 新类的__dict__
+            kwargs: The kwargs passed to the class being created. 新类创建时接受的kw
 
         Returns:
             A `ConfigWrapper` instance for `BaseModel`.
         """
-        config_new = ConfigDict()
+        """
+            构建新的config给新的类,
+            新的config取自 
+                1. 新类的基类的model_config属性
+                2. 
+            config本质是一个字典
+        """
+
+        config_new = ConfigDict() # 获取一个新的ConfigDict , ConfigDict是带有类型检查(非强制)可选key的字典 
         for base in bases:
             config = getattr(base, 'model_config', None)
             if config:
-                config_new.update(config.copy())
+                config_new.update(config.copy()) # 将基类的model_config属性放入新的config中
 
         config_class_from_namespace = namespace.get('Config')
         config_dict_from_namespace = namespace.get('model_config')

@@ -29,6 +29,10 @@ ExtraValues = Literal['allow', 'ignore', 'forbid']
 
 class ConfigDict(TypedDict, total=False):
     """A TypedDict for configuring Pydantic behaviour."""
+    """
+        一个用于指定字典中属性的类型的类型检查类
+        *本质是一个字典*
+    """
 
     title: str | None
     """The title for the generated JSON schema, defaults to the model's name"""
